@@ -1,0 +1,72 @@
+#include <stdio.h> 
+#include <stdbool.h> 
+#include <time.h> 
+#define MAX_V 100 
+#define INFINITY 100000 
+int minDistance(int dist[], bool taken[], int V) 
+{ 
+int min = INFINITY, min_index; 
+for (int v = 0; v < V; v++){ 
+if (!taken[v] && dist[v] <= min){ 
+            min = dist[v]; 
+            min_index = v; 
+        } 
+    } 
+    return min_index; 
+} 
+ 
+void dijkstra(int graph[MAX_V][MAX_V], int src, int V) 
+{ 
+    int dist[V]; 
+    bool taken[V]; 
+    int u; 
+ 
+    for (int i = 0; i < V; i++) { 
+        dist[i] = INFINITY; 
+        taken[i] = false; 
+    } 
+ 
+    dist[src] = 0; 
+ 
+    for (int i = 0; i < V - 1; i++) 
+    { 
+        u = minDistance(dist, taken, V); 
+        taken[u] = true; 
+ 
+        for (int v = 0; v < V; v++){ 
+            if (!taken[v] && graph[u][v] && dist[u] != INFINITY && dist[u] + graph[u][v] < dist[v]){ 
+                dist[v] = dist[u] + graph[u][v]; 
+            } 
+        } 
+    }  
+ 
+    printf("\nVertex \t Distance from Source\n"); 
+    for (int i = 0; i < V; i++){ 
+        printf("%d \t\t %d\n", i, dist[i]); 
+    } 
+}  
+ 
+int main() 
+{ 
+    int V; 
+    printf("Enter the number of vertices: "); 
+    scanf("%d", &V); 
+ 
+int graph[MAX_V][MAX_V]; 
+printf("Enter the adjacency matrix (0 if no edge):\n"); 
+for (int i = 0; i < V; i++){ 
+for (int j = 0; j < V; j++){ 
+scanf("%d", &graph[i][j]); 
+} 
+} 
+int src; 
+printf("Enter the source vertex: "); 
+scanf("%d", &src); 
+clock_t t; 
+t = clock(); 
+dijkstra(graph, src, V); 
+t = clock() - t; 
+double time_taken = ((double)t) / CLOCKS_PER_SEC; 
+printf("Dijakstra's Algorithm took %f seconds to execute\n", time_taken); 
+return 0; 
+}
