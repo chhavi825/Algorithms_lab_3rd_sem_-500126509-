@@ -1,0 +1,129 @@
+#include <stdio.h>
+
+void merge(int w[], float ratio[], int v[], int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    int Lw[n1], Lv[n1];
+    float Lratio[n1];
+    int Rw[n2], Rv[n2];
+    float Rratio[n2];
+
+    // Copy data to temporary arrays
+    for (int i = 0; i < n1; i++) {
+        Lw[i] = w[left + i];
+        Lratio[i] = ratio[left + i];
+        Lv[i] = v[left + i];
+    }
+    for (int i = 0; i < n2; i++) {
+        Rw[i] = w[mid + 1 + i];
+        Rratio[i] = ratio[mid + 1 + i];
+        Rv[i] = v[mid + 1 + i];
+    }
+
+    int i = 0, j = 0, k = left;
+
+    // Merge the temporary arrays back into the original arrays
+    while (i < n1 && j < n2) {
+        if (Lratio[i] >= Rratio[j]) {
+            w[k] = Lw[i];
+            ratio[k] = Lratio[i];
+            v[k] = Lv[i];
+            i++;
+        } else {
+            w[k] = Rw[j];
+            ratio[k] = Rratio[j];
+            v[k] = Rv[j];
+            j++;
+        }
+        k++;
+    }
+
+    // Copy any remaining elements
+    while (i < n1) {
+        w[k] = Lw[i];
+        ratio[k] = Lratio[i];
+        v[k] = Lv[i];
+        i++;
+        k++;
+    }
+    while (j < n2) {
+        w[k] = Rw[j];
+        ratio[k] = Rratio[j];
+        v[k] = Rv[j];
+        j++;
+        k++;
+    }
+}
+
+void mergeSort(int w[], float ratio[], int v[], int left, int right) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+        mergeSort(w, ratio, v, left, mid);
+        mergeSort(w, ratio, v, mid + 1, right);
+        merge(w, ratio, v, left, mid, right);
+    }
+}
+
+void fractionalKnapsack(int W, int w[], int v[], int n) {
+    float x[n];
+    float ratio[n];
+
+    for (int i = 0; i < n; i++) {
+        ratio[i] = (float)v[i] / w[i];
+    }
+
+    mergeSort(w, ratio, v, 0, n - 1);
+
+    for (int i = 0; i < n; i++) {
+        x[i] = 0;
+    }
+
+    int weight = 0;
+    int i = 0;
+
+    while (i < n && weight < W) {
+        if ((weight + w[i]) <= W) {
+            x[i] = 1;
+            weight += w[i];
+        } else {
+            x[i] = (float)(W - weight) / w[i];
+            weight = W;
+        }
+        printf("Item with profit %d is picked %.2f%%\n", v[i], x[i] * 100);
+        i++;
+    }
+
+    float profit = 0;
+    for (int i = 0; i < n; i++) {
+        profit += (v[i] * x[i]);
+    }
+
+    printf("Total Profit: %.2f\n", profit);
+}
+
+int main() {
+    int n;
+    printf("Enter the number of items: ");
+    scanf("%d", &n);
+
+    int w[n];
+    printf("Enter the weights: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &w[i]);
+    }
+
+    int v[n];
+    printf("Enter the values: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &v[i]);
+    }
+
+    int W;
+    printf("Enter the total capacity of the knapsack: ");
+    scanf("%d", &W);
+
+    fractionalKnapsack(W, w, v, n);
+
+    return 0;
+}
