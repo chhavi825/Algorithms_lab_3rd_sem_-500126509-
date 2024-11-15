@@ -1,0 +1,124 @@
+#include <stdio.h>
+
+void add(int n, int A[n][n], int B[n][n], int result[n][n]){
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            result[i][j] = A[i][j] + B[i][j];
+}
+
+void subtract(int n, int A[n][n], int B[n][n], int result[n][n]){
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            result[i][j] = A[i][j] - B[i][j];
+}
+
+void strassen(int n, int A[n][n], int B[n][n], int C[n][n]){
+    if (n == 1) {
+        C[0][0] = A[0][0] * B[0][0];
+        return;
+    }
+
+    int n_half = n / 2;
+
+    int A11[n_half][n_half], A12[n_half][n_half], A21[n_half][n_half], A22[n_half][n_half];
+    int B11[n_half][n_half], B12[n_half][n_half], B21[n_half][n_half], B22[n_half][n_half];
+    int C11[n_half][n_half], C12[n_half][n_half], C21[n_half][n_half], C22[n_half][n_half];
+    int M1[n_half][n_half], M2[n_half][n_half], M3[n_half][n_half], M4[n_half][n_half];
+    int M5[n_half][n_half], M6[n_half][n_half], M7[n_half][n_half];
+    int temp1[n_half][n_half], temp2[n_half][n_half];
+
+    for (int i = 0; i < n_half; i++) {
+        for (int j = 0; j < n_half; j++) {
+            A11[i][j] = A[i][j];
+            A12[i][j] = A[i][j + n_half];
+            A21[i][j] = A[i + n_half][j];
+            A22[i][j] = A[i + n_half][j + n_half];
+
+            B11[i][j] = B[i][j];
+            B12[i][j] = B[i][j + n_half];
+            B21[i][j] = B[i + n_half][j];
+            B22[i][j] = B[i + n_half][j + n_half];
+        }
+    }
+
+    add(n_half, A11, A22, temp1);
+    add(n_half, B11, B22, temp2);
+    strassen(n_half, temp1, temp2, M1);
+
+    add(n_half, A21, A22, temp1);
+    strassen(n_half, temp1, B11, M2);
+
+    subtract(n_half, B12, B22, temp2);
+    strassen(n_half, A11, temp2, M3);
+
+    subtract(n_half, B21, B11, temp2);
+    strassen(n_half, A22, temp2, M4);
+
+    add(n_half, A11, A12, temp1);
+    strassen(n_half, temp1, B22, M5);
+
+    subtract(n_half, A21, A11, temp1);
+    add(n_half, B11, B12, temp2);
+    strassen(n_half, temp1, temp2, M6);
+
+    subtract(n_half, A12, A22, temp1);
+    add(n_half, B21, B22, temp2);
+    strassen(n_half, temp1, temp2, M7);
+
+    add(n_half, M1, M4, temp1);
+    subtract(n_half, temp1, M5, temp2);
+    add(n_half, temp2, M7, C11);
+
+    add(n_half, M3, M5, C12);
+    add(n_half, M2, M4, C21);
+
+    add(n_half, M1, M3, temp1);
+    subtract(n_half, temp1, M2, temp2);
+    add(n_half, temp2, M6, C22);
+
+    for (int i = 0; i < n_half; i++) {
+        for (int j = 0; j < n_half; j++) {
+            C[i][j] = C11[i][j];
+            C[i][j + n_half] = C12[i][j];
+            C[i + n_half][j] = C21[i][j];
+            C[i + n_half][j + n_half] = C22[i][j];
+        }
+    }
+}
+
+int main(){
+    int size;
+
+    printf("Enter the size of the matrices (must be a power of 2): ");
+    scanf("%d", &size);
+
+    int A[size][size], B[size][size], C[size][size];
+
+    printf("Enter elements of matrix A:\n");
+    for (int i = 0; i < size; i++){
+        for (int j = 0; j < size; j++) {
+            printf("Enter element [%d][%d]: ", i, j);
+            scanf("%d", &A[i][j]);
+        }
+    }
+
+    printf("Enter elements of matrix B:\n");
+    for (int i = 0; i < size; i++){
+        for (int j = 0; j < size; j++){
+            printf("Enter element [%d][%d]: ", i, j);
+            scanf("%d", &B[i][j]);
+        }
+    }
+
+    strassen(size, A, B, C);
+
+    printf("Resultant matrix C:\n");
+    for (int i = 0; i < size; i++){
+        for (int j = 0; j < size; j++){
+            printf("%d ", C[i][j]);
+        }
+        printf("\n");
+    }
+
+    return 0;
+}
