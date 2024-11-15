@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node {
+    int level;
+    int profit;
+    int weight;
+    float bound;
+} Node;
+
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+float bound(Node u, int W, int wt[], int val[], int n) {
+    if (u.weight >= W)
+        return 0;
+    
+    float profit_bound = u.profit;
+    int j = u.level + 1;
+    int total_weight = u.weight;
+
+    while (j < n && total_weight + wt[j] <= W) {
+        total_weight += wt[j];
+        profit_bound += val[j];
+        j++;
+    }
+
+    if (j < n)
+        profit_bound += (W - total_weight) * val[j] / wt[j];
+
+    return profit_bound;
+}
+
+void knapsack(int W, int wt[], int val[], int n) {
+    Node u, v;
+    int max_profit = 0;
+    u.level = -1;
+    u.profit = u.weight = 0;
+
+    Node queue[1000];
+    int front = 0, rear = 0;
+
+    queue[rear++] = u;
+    while (front < rear) {
+        u = queue[front++];
+        
+        if (u.level == n - 1)
+            continue;
+
+        v.level = u.level + 1;
+        v.weight = u.weight + wt[v.level];
+        v.profit = u.profit + val[v.level];
+
+        if (v.weight <= W && v.profit > max_profit)
+            max_profit = v.profit;
+
+        v.bound = bound(v, W, wt, val, n);
+
+        if (v.bound > max_profit)
+            queue[rear++] = v;
+
+        v.weight = u.weight;
+        v.profit = u.profit;
+        v.bound = bound(v, W, wt, val, n);
+
+        if (v.bound > max_profit)
+            queue[rear++] = v;
+    }
+
+    printf("Maximum Profit: %d\n", max_profit);
+}
+
+int main() {
+    int W = 50;
+    int wt[] = {10, 20, 30, 40};
+    int val[] = {60, 100, 120, 140};
+    int n = 4;
+
+    knapsack(W, wt, val, n);
+
+    return 0;
+}
