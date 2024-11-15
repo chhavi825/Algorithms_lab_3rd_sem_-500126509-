@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <time.h>
+
+void summ(int arr[], int subset[], int n, int t, int sum, int i) {
+    if (sum == t) {
+        printf("Subset found: ");
+        for (int j = 0; j < i; j++) {
+            printf("%d ", subset[j]);
+        }
+        printf("\n");
+        return;
+    } 
+
+    if (n == 0 || sum > t) {
+        return;
+    }
+
+    subset[i] = arr[0];
+    summ(arr + 1, subset, n - 1, t, sum + arr[0], i + 1);
+
+    summ(arr + 1, subset, n - 1, t, sum, i);
+} 
+
+int main() {
+    int n, t;
+
+    printf("Enter the number of elements in the set: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    int subset[n];
+
+    printf("Enter the elements of the set: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    } 
+
+    printf("Enter the target sum: ");
+    scanf("%d", &t);
+
+    clock_t time;
+    time = clock();
+
+    printf("\nSubsets with sum %d:\n", t);
+    summ(arr, subset, n, t, 0, 0);
+
+    time = clock() - time;
+    double time_taken = ((double)time) / CLOCKS_PER_SEC;
+    printf("Sum of subset problem took %f seconds to execute \n", time_taken);
+
+    return 0;
+}
