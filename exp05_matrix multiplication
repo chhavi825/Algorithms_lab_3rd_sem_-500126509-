@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include <time.h>
+
+#define INFINITY 10000
+
+void printSolution(int ind[][100], int i, int j) {
+    if (i == j) {
+        printf("A%d ", i);
+    } else {
+        printf("(");
+        printSolution(ind, i, ind[i][j]);
+        printSolution(ind, ind[i][j] + 1, j);
+        printf(") ");
+    }
+}
+
+void matrixChainMultiplication(int d[], int n) {
+    int cost[100][100], ind[100][100];
+
+    for (int i = 1; i < n; i++) {
+        cost[i][i] = 0;
+    }
+
+    for (int len = 2; len < n; len++) { 
+        for (int i = 1; i < n - len + 1; i++) {
+            int j = i + len - 1;
+            cost[i][j] = INFINITY;
+            for (int k = i; k <= j - 1; k++) {
+                int q = cost[i][k] + cost[k + 1][j] + d[i - 1] * d[k] * d[j];
+                if (q < cost[i][j]) {
+                    cost[i][j] = q;
+                    ind[i][j] = k;
+                }
+            }
+        }
+    }
+
+    printf("Order in which matrices will be multiplied is: ");
+    printSolution(ind, 1, n - 1);
+    printf("\n");
+}
+
+int main() {
+    int n;
+
+    printf("Enter the number of matrices: ");
+    scanf("%d", &n);
+
+    int d[n + 1];
+    printf("Enter the dimensions:\n");
+    for (int i = 0; i <= n; i++) {
+        printf("Dimension %d: ", i + 1);
+        scanf("%d", &d[i]);
+    }
+
+    clock_t t;
+    t = clock();
+    matrixChainMultiplication(d, n + 1);
+    t = clock() - t;
+
+    double time_taken = ((double)t) / CLOCKS_PER_SEC;
+    printf("\nMatrix chain multiplication algorithm took %f seconds to execute\n", time_taken);
+
+    return 0;
+}
