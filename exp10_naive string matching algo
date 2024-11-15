@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <time.h>
+
+void naive_string_matching(char *text, char *pattern) {
+    int n = strlen(text);
+    int m = strlen(pattern);
+
+    for (int i = 0; i <= n - m; i++) {
+        int j = 0;
+        while (j < m && text[i + j] == pattern[j]) {
+            j++;
+        }
+        if (j == m) {
+            printf("Pattern found at index %d\n", i);
+        }
+    }
+}
+
+int main() {
+    char text[100], pattern[100];
+
+    printf("Enter the text: ");
+    scanf("%s", text);
+
+    printf("Enter the pattern: ");
+    scanf("%s", pattern);
+
+    clock_t time;
+    time = clock();
+
+    printf("\nNaive String Matching:\n");
+    naive_string_matching(text, pattern);
+
+    time = clock() - time;
+    double time_taken = ((double)time) / CLOCKS_PER_SEC;
+    printf("Naive string-matching took %f seconds to execute\n", time_taken);
+
+    return 0;
+}
