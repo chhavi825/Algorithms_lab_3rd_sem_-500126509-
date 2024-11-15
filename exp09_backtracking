@@ -1,0 +1,27 @@
+#include <stdio.h>
+
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+void knapsack(int W, int wt[], int val[], int n, int i, int current_weight, int current_value) {
+    if (i == n || current_weight > W) {
+        printf("Max Value: %d\n", current_value);
+        return;
+    }
+
+    if (current_weight + wt[i] <= W) {
+        knapsack(W, wt, val, n, i + 1, current_weight + wt[i], current_value + val[i]);
+    }
+    knapsack(W, wt, val, n, i + 1, current_weight, current_value);
+}
+
+int main() {
+    int n = 4, W = 50;
+    int wt[] = {10, 20, 30, 40};
+    int val[] = {60, 100, 120, 140};
+
+    knapsack(W, wt, val, n, 0, 0, 0);
+
+    return 0;
+}
